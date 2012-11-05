@@ -1,4 +1,4 @@
-# Triglav::Client
+# Triglav::Client [![BuildStatus](https://secure.travis-ci.org/kentaro/triglav-client.png)](http://travis-ci.org/kentaro/triglav-client)
 
 Triglav::Client is a Ruby interface to [Triglav](http://github.com/kentaro/triglav) API.
 
