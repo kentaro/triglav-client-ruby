@@ -6,7 +6,10 @@ end
 
 shared_context 'initialize client' do
   let(:client) {
-    Triglav::Client.new(base_url: 'http://example.com/', api_token: 'xxxxxxxxxx')
+    Triglav::Client.new(
+      base_url:  'http://example.com/',
+      api_token: 'xxxxxxxxxxxxxxxxxxx',
+    )
   }
   subject { client }
 end

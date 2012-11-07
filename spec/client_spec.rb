@@ -18,13 +18,13 @@ describe Triglav::Client do
 
     context 'when only `base_url` is passed' do
       it {
-        expect { Triglav::Client.new }.to raise_error(ArgumentError)
+        expect { Triglav::Client.new(base_url: 'http://example.com/') }.to raise_error(ArgumentError)
       }
     end
 
     context 'when `api_token` is passed' do
       it {
-        expect { Triglav::Client.new }.to raise_error(ArgumentError)
+        expect { Triglav::Client.new(api_token: 'xxxxxxxxxxxxxxxxxxx') }.to raise_error(ArgumentError)
       }
     end
   end

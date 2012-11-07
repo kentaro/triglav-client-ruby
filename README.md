@@ -9,25 +9,25 @@ require 'triglav/client'
 
 client = Triglav::Client.new(
   base_url:  'http://example.com/',  # Base URL which your Triglav is located at
-  api_token: 'xxxxxxxxxx'            # You can get it from your page on Triglav
+  api_token: 'xxxxxxxxxxxxxxxxxxx'   # You can get it from your page on Triglav
 )
 
 # Services
-client.services #=> Returns all the services registered on Triglav
+client.services                      #=> Returns all the services registered on Triglav
 
 # Roles
-client.roles    #=> Returns all the roles registered on Triglav
-client.roles_in('service') #=> Only roles in the service
+client.roles                         #=> Returns all the roles registered on Triglav
+client.roles_in('sqale')             #=> Only roles in the service
 
-# Active Hosts (default behaviour)
-client.hosts    #=> Returns all the hosts registered on Triglav
-client.hosts_in('service')         #=> Only hosts in the service
-client.hosts_in('service', 'role') #=> Only hosts in the service and which have the role
+# Active hosts (default behaviour)
+client.hosts                         #=> Returns all the hosts registered on Triglav
+client.hosts_in('sqale')             #=> Only hosts in the service
+client.hosts_in('sqale', 'users')    #=> Only hosts in the service and which have the role
 
-# Inactive Hosts
+# All hosts including inactive ones
 client.hosts(with_inactive: true)
-client.hosts_in('service', nil, with_inactive: true)
-client.hosts_in('service', 'role', with_inactive: true)
+client.hosts_in('sqale',     nil, with_inactive: true)
+client.hosts_in('sqale', 'users', with_inactive: true)
 ```
 
 ## Installation
