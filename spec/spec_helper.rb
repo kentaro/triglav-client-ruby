@@ -1,4 +1,5 @@
 require 'triglav/client'
+require 'triglav/model'
 
 require 'rspec'
 RSpec.configure do |config|
@@ -37,5 +38,36 @@ shared_context 'initialize client with fixtures' do
       { 'host' => { 'id' => 2, 'active' => false } },
       { 'host' => { 'id' => 2, 'active' => true }  },
     ]
+  }
+end
+
+shared_context 'initialize client with model fixtures' do
+  include_context 'initialize client'
+
+  let(:model) {
+    info = fixture_for(model_name)[model_name]
+
+    klass_name.new(
+      client: client,
+      info:   info
+    )
+  }
+
+  subject { model }
+
+  def fixture_for(model_name)
+    __send__(model_name)
+  end
+
+  let(:service) {
+    { 'service' => { 'id' => 1, 'name' => 'test service' } }
+  }
+
+  let(:role) {
+    { 'role' => { 'id' => 1, 'name' => 'test role' } }
+  }
+
+  let(:host) {
+    { 'host' => { 'id' => 1, 'name' => 'test host', 'active' => true }  }
   }
 end
