@@ -19,7 +19,7 @@ module Triglav
       end
 
       def update(params = {})
-        client.dispatch_request('post', "/api/#{path}/#{info.name}.json", params)
+        client.dispatch_request('put', "/api/#{path}/#{info.name}.json", params)
       end
 
       def destroy
@@ -27,7 +27,7 @@ module Triglav
       end
 
       def revert
-        client.dispatch_request('post', "/api/#{path}/#{info.name}/revert.json")
+        client.dispatch_request('put', "/api/#{path}/#{info.name}/revert.json")
       end
     end
 
