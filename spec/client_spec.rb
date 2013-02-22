@@ -29,6 +29,38 @@ describe Triglav::Client do
     end
   end
 
+  describe 'endpoint_for' do
+    context 'when no arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:services)).to be == [
+          :get, '/api/services.json'
+        ]
+      }
+    end
+
+    context 'when an arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:roles_in, 'triglav')).to be == [
+          :get, '/api/services/triglav/roles.json'
+        ]
+      }
+    end
+
+    context 'when two arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:hosts_in, 'triglav', 'app')).to be == [
+          :get, '/api/services/triglav/roles/app/hosts.json'
+        ]
+      }
+    end
+  end
+
   describe '#services' do
     include_context 'initialize client with fixtures'
 

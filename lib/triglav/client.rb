@@ -18,23 +18,48 @@ module Triglav
       end
     end
 
+    API_ENDPOINT_MAP = {
+      services: { method: :get, path: '/api/services.json'            },
+      roles:    { method: :get, path: '/api/roles.json'               },
+      roles_in: { method: :get, path: ['/api/services/%s/roles.json'] },
+      hosts:    { method: :get, path: '/api/hosts.json'               },
+      hosts_in: {
+        method: :get,
+        path: [
+          '/api/services/%s/hosts.json',
+          '/api/services/%s/roles/%s/hosts.json',
+        ]
+      },
+    }
+
+    def endpoint_for (type, *args)
+      endpoint = API_ENDPOINT_MAP[type]
+
+      if args.empty?
+        [endpoint[:method], endpoint[:path]]
+      else
+        path = endpoint[:path][args.size - 1]
+        [endpoint[:method], path % args]
+      end
+    end
+
     def services
-      response = dispatch_request('get', '/api/services.json')
+      response = dispatch_request(:get, '/api/services.json')
       response.map { |e| e['service'] }
     end
 
     def roles
-      response = dispatch_request('get', '/api/roles.json')
+      response = dispatch_request(:get, '/api/roles.json')
       response.map { |e| e['role'] }
     end
 
     def roles_in (service)
-      response = dispatch_request('get', "/api/services/#{service}/roles.json")
+      response = dispatch_request(:get, "/api/services/#{service}/roles.json")
       response.map { |e| e['role'] }
     end
 
     def hosts (options = {})
-      response = dispatch_request('get', '/api/hosts.json')
+      response = dispatch_request(:get, '/api/hosts.json')
       response.map { |e| e['host'] }.select do |h|
         if options[:with_inactive]
           true
@@ -52,9 +77,9 @@ module Triglav
       end
 
       if (role)
-        response = dispatch_request('get', "/api/services/#{service}/roles/#{role}/hosts.json")
+        response = dispatch_request(:get, "/api/services/#{service}/roles/#{role}/hosts.json")
       else
-        response = dispatch_request('get', "/api/services/#{service}/hosts.json")
+        response = dispatch_request(:get, "/api/services/#{service}/hosts.json")
       end
 
       response.map { |e| e['host'] }.select do |h|
@@ -71,7 +96,7 @@ module Triglav
         raise ArgumentError.new("Both `method` and `path` are required.")
       end
 
-      json = do_request(method, path, params)
+      json = do_request(method.to_s, path, params)
       JSON.parse(json)
     end
 
