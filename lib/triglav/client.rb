@@ -36,30 +36,35 @@ module Triglav
       endpoint = API_ENDPOINT_MAP[type]
 
       if args.empty?
-        [endpoint[:method], endpoint[:path]]
+        endpoint
       else
         path = endpoint[:path][args.size - 1]
-        [endpoint[:method], path % args]
+
+        {
+          method: endpoint[:method],
+          path:   path % args,
+        }
       end
     end
 
     def services
-      response = dispatch_request(:get, '/api/services.json')
+      endpoint = endpoint_for(:services)
+      response = dispatch_request(endpoint[])
       response.map { |e| e['service'] }
     end
 
     def roles
-      response = dispatch_request(:get, '/api/roles.json')
+      response = dispatch_request(endpoint_for(:roles))
       response.map { |e| e['role'] }
     end
 
     def roles_in (service)
-      response = dispatch_request(:get, "/api/services/#{service}/roles.json")
+      response = dispatch_request(endpoint_for(:roles_in, service))
       response.map { |e| e['role'] }
     end
 
     def hosts (options = {})
-      response = dispatch_request(:get, '/api/hosts.json')
+      response = dispatch_request(endpoint_for(:hosts))
       response.map { |e| e['host'] }.select do |h|
         if options[:with_inactive]
           true
@@ -77,9 +82,9 @@ module Triglav
       end
 
       if (role)
-        response = dispatch_request(:get, "/api/services/#{service}/roles/#{role}/hosts.json")
+        response = dispatch_request(:hosts_in, service, role)
       else
-        response = dispatch_request(:get, "/api/services/#{service}/hosts.json")
+        response = dispatch_request(hosts_in, service)
       end
 
       response.map { |e| e['host'] }.select do |h|

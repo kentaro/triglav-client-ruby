@@ -63,6 +63,7 @@ describe Triglav::Client do
 
   describe '#services' do
     include_context 'initialize client with fixtures'
+    let(:endpoint) { subject.endpoint_for(:serices) }
 
     before {
       subject.stub(:dispatch_request).and_return(services)

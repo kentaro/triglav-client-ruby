@@ -2,21 +2,44 @@ require 'triglav/client'
 require 'triglav/model'
 
 require 'rspec'
+require 'webmock/rspec'
+
 RSpec.configure do |config|
+end
+
+def request(subject, method, path, params, result)
+  if !ENV['LIVE_TEST']
+    stub_request(method, "#{subject.base_url}#{path}").to_return(
+      status: result[:code],
+      body:   result[:body].to_json
+    )
+  end
 end
 
 shared_context 'initialize client' do
   let(:client) {
     Triglav::Client.new(
-      base_url:  'http://example.com/',
-      api_token: 'xxxxxxxxxxxxxxxxxxx',
+      base_url:  ENV['TRIGLAV_BASE_URL'] ||'http://127.0.0.1:3000',
+      api_token: ENV['TRIGLAV_API_KEY']  || 'xxxxxxxxxxxxxxxxxxx',
     )
   }
   subject { client }
 end
 
+shared_context 'setup request' do
+  before {
+    if !ENV['LIVE_TEST']
+      stub_request(endpoint[:method], "#{subject.base_url}#{endpoint[:path]}").to_return(
+        status: res_code,
+        body:   res_body,
+      )
+    end
+  }
+end
+
 shared_context 'initialize client with fixtures' do
   include_context 'initialize client'
+  include_context 'setup request'
 
   let(:services) {
     [
@@ -43,6 +66,7 @@ end
 
 shared_context 'initialize client with model fixtures' do
   include_context 'initialize client'
+  include_context 'setup request'
 
   let(:model) {
     info = fixture_for(model_name)[model_name]
