@@ -59,7 +59,7 @@ module Triglav
         result   = client.dispatch_request(
           endpoint[:method],
           endpoint[:path],
-          build_params(params),
+          self.class.build_params(params),
         )
         self.class.new(client: client, info: result[self.class.param])
       end
