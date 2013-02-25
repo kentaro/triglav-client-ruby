@@ -73,6 +73,24 @@ shared_context 'initialize client with model fixtures' do
     )
   }
 
+  let(:service_model) {
+    info = fixture_for(:service)['service']
+
+    klass_name.new(
+      client: client,
+      info:   info
+    )
+  }
+
+  let(:role_model) {
+    info = fixture_for(:role)['role']
+
+    klass_name.new(
+      client: client,
+      info:   info
+    )
+  }
+
   def fixture_for(model_name)
     __send__(model_name)
   end

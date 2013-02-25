@@ -93,6 +93,17 @@ module Triglav
       def self.path
         'hosts'
       end
+
+      def add_relation(service, role)
+        endpoint = self.class.endpoint_for(:update, info.name)
+        result   = client.dispatch_request(
+          endpoint[:method],
+          endpoint[:path],
+          'host[host_relations_attributes][0][service_id]' => service.info.id,
+          'host[host_relations_attributes][0][role_id]'    => role.info.id,
+        )
+        self.class.new(client: client, info: result[self.class.param])
+      end
     end
   end
 end
