@@ -26,34 +26,46 @@ module Triglav
         { method: endpoint[:method], path: path }
       end
 
+      def self.param
+        self.class.to_s.split('::').last.downcase
+      end
+
       def self.create(client, params = {})
         endpoint = endpoint_for(:create)
-        result   = client.dispatch_request(endpoint[:method], endpoint[:path], params)
-        new(client: client, info: result)
+        result   = client.dispatch_request(
+          endpoint[:method],
+          endpoint[:path],
+          param => params,
+        )
+        new(client: client, info: result[param])
       end
 
       def show
         endpoint = self.class.endpoint_for(:show, info.name)
         result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+        self.class.new(client: client, info: result[self.class.param])
       end
 
       def update(params = {})
         endpoint = self.class.endpoint_for(:update, info.name)
-        result   = client.dispatch_request(endpoint[:method], endpoint[:path], params)
-        self.class.new(client: client, info: result)
+        result   = client.dispatch_request(
+          endpoint[:method],
+          endpoint[:path],
+          self.class.param => params,
+        )
+        self.class.new(client: client, info: result[self.class.param])
       end
 
       def destroy
         endpoint = self.class.endpoint_for(:destroy, info.name)
         result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+        self.class.new(client: client, info: result[self.class.param])
       end
 
       def revert
         endpoint = self.class.endpoint_for(:revert, info.name)
         result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+        self.class.new(client: client, info: result[self.class.param])
       end
     end
 
