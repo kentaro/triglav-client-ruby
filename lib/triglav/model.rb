@@ -21,13 +21,21 @@ module Triglav
 
       def self.endpoint_for (type, *args)
         endpoint = API_ENDPOINT_MAP[type]
-        path = endpoint[:path] % [self.path, *args.map { |e| URI.encode(e) }]
+        endpoint_path = endpoint[:path] % [self.path, *args.map { |e| URI.encode(e) }]
 
-        { method: endpoint[:method], path: path }
+        { method: endpoint[:method], path: endpoint_path }
       end
 
       def self.param
-        self.class.to_s.split('::').last.downcase
+        self.to_s.split('::').last.downcase
+      end
+
+      def self.build_params(params)
+        build_params = {}
+        params.each do |key, value|
+          build_params["#{self.param}[#{key}]"] = value
+        end
+        build_params
       end
 
       def self.create(client, params = {})
@@ -35,7 +43,7 @@ module Triglav
         result   = client.dispatch_request(
           endpoint[:method],
           endpoint[:path],
-          param => params,
+          build_params(params),
         )
         new(client: client, info: result[param])
       end
@@ -51,7 +59,7 @@ module Triglav
         result   = client.dispatch_request(
           endpoint[:method],
           endpoint[:path],
-          self.class.param => params,
+          build_params(params),
         )
         self.class.new(client: client, info: result[self.class.param])
       end

@@ -2,7 +2,10 @@ require 'triglav/client'
 require 'triglav/model'
 
 require 'rspec'
-require 'webmock/rspec'
+
+unless ENV['LIVE_TEST']
+  require 'webmock/rspec'
+end
 
 RSpec.configure do |config|
 end
