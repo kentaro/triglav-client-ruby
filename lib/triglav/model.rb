@@ -2,7 +2,7 @@ require 'ostruct'
 
 module Triglav
   module Model
-    module Base
+    class Base
       attr_reader :client, :info
 
       def initialize(args)
@@ -10,37 +10,44 @@ module Triglav
         @info   = OpenStruct.new(args[:info])
       end
 
-      def path
-        self.class.to_s.split('::').last.downcase + 's'
+      def self.create(client, params = {})
+        result = client.dispatch_request(:post, "/api/#{path}", params)
+        self.new(client: client, info: result)
       end
 
       def show
-        client.dispatch_request('get', "/api/#{path}/#{info.name}.json")
+        client.dispatch_request(:get, "/api/#{self.class.path}/#{info.name}.json")
       end
 
       def update(params = {})
-        client.dispatch_request('put', "/api/#{path}/#{info.name}.json", params)
+        client.dispatch_request(:put, "/api/#{self.class.path}/#{info.name}.json", params)
       end
 
       def destroy
-        client.dispatch_request('delete', "/api/#{path}/#{info.name}.json")
+        client.dispatch_request(:delete, "/api/#{self.class.path}/#{info.name}.json")
       end
 
       def revert
-        client.dispatch_request('put', "/api/#{path}/#{info.name}/revert.json")
+        client.dispatch_request(:put, "/api/#{self.class.path}/#{info.name}/revert.json")
       end
     end
 
-    class Service
-      include Base
+    class Service < Base
+      def self.path
+        'services'
+      end
     end
 
-    class Role
-      include Base
+    class Role < Base
+      def self.path
+        'roles'
+      end
     end
 
-    class Host
-      include Base
+    class Host < Base
+      def self.path
+        'hosts'
+      end
     end
   end
 end

@@ -74,6 +74,30 @@ describe Triglav::Client do
     end
   end
 
+  describe '#create' do
+    include_context 'initialize client with model fixtures'
+
+    let(:fixture)  { fixture_for('service') }
+    let(:endpoint) { { method: :post, path: "/api/services" } }
+    let(:res_code) { 204 }
+    let(:res_body) { fixture.to_json }
+
+    context 'when model is successfully created' do
+      it {
+        result = client.create(:service, name: fixture['service']['name'])
+        expect(result).to be_an_instance_of(Triglav::Model::Service)
+      }
+    end
+
+    context 'when an invalid model name is passed' do
+      it {
+        expect {
+          client.create(:no_such_model)
+        }.to raise_error(ArgumentError)
+      }
+    end
+  end
+
   describe '#services' do
     include_context 'initialize client with fixtures'
 

@@ -11,6 +11,20 @@ require 'spec_helper'
 
     include_context 'initialize client with model fixtures'
 
+    describe '.create' do
+      context 'when a model successfully created' do
+        let(:fixture)  { fixture_for(model_name) }
+        let(:endpoint) { { method: :post, path: "/api/#{klass.path}" } }
+        let(:res_code) { 204 }
+        let(:res_body) { fixture.to_json }
+
+        it {
+          result = klass_name.create(client, name: fixture[model_name]['name'])
+          expect(result).to be_an_instance_of(klass)
+        }
+      end
+    end
+
     describe '#show' do
       before {
         subject.client.stub(:dispatch_request).and_return(fixture_for(model_name))

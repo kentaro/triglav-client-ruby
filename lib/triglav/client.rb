@@ -51,6 +51,15 @@ module Triglav
       end
     end
 
+    def create (model, params)
+      case model
+        when :service; Model::Service.create(self, params)
+        when :role;    Model::Role.create(self, params)
+        when :host;    Model::Host.create(self, params)
+        else raise ArgumentError.new("No such model for #{model}")
+      end
+    end
+
     def services
       endpoint = endpoint_for(:services)
       response = dispatch_request(endpoint[:method], endpoint[:path])
@@ -120,7 +129,7 @@ module Triglav
         raise ArgumentError.new("Both `method` and `path` are required.")
       end
 
-      json = do_request(method.to_s, path, params)
+      json = do_request(method, path, params)
       JSON.parse(json)
     end
 
@@ -129,9 +138,16 @@ module Triglav
     def do_request(method, path, params = {})
       uri = URI.parse(base_url)
       uri.path  = path
+      path = "#{uri.path}?api_token=#{api_token}"
+
+      req = case method
+            when :get;    Net::HTTP::Get.new(path)
+            when :post;   req = Net::HTTP::Post.new(path); req.set_form_data(params); req
+            when :delete; Net::HTTP::Delete.new(path)
+            end
 
       response = Net::HTTP.start(uri.host, uri.port) do |http|
-        http.__send__(method, "#{uri.path}?api_token=#{api_token}")
+        http.request(req)
       end
 
       if response.code.to_i >= 300

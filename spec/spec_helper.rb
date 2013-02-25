@@ -7,15 +7,6 @@ require 'webmock/rspec'
 RSpec.configure do |config|
 end
 
-def request(subject, method, path, params, result)
-  if !ENV['LIVE_TEST']
-    stub_request(method, "#{subject.base_url}#{path}").to_return(
-      status: result[:code],
-      body:   result[:body].to_json
-    )
-  end
-end
-
 shared_context 'initialize client' do
   let(:client) {
     Triglav::Client.new(
@@ -31,7 +22,7 @@ shared_context 'setup request' do
     if !ENV['LIVE_TEST']
       stub_request(
         endpoint[:method],
-        "#{subject.base_url}#{endpoint[:path]}?api_token=#{subject.api_token}").to_return(
+        "#{client.base_url}#{endpoint[:path]}?api_token=#{client.api_token}").to_return(
         status: res_code,
         body:   res_body,
       )
@@ -78,8 +69,6 @@ shared_context 'initialize client with model fixtures' do
       info:   info
     )
   }
-
-  subject { model }
 
   def fixture_for(model_name)
     __send__(model_name)
