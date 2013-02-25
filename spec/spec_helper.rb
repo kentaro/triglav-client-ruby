@@ -29,7 +29,9 @@ end
 shared_context 'setup request' do
   before {
     if !ENV['LIVE_TEST']
-      stub_request(endpoint[:method], "#{subject.base_url}#{endpoint[:path]}").to_return(
+      stub_request(
+        endpoint[:method],
+        "#{subject.base_url}#{endpoint[:path]}?api_token=#{subject.api_token}").to_return(
         status: res_code,
         body:   res_body,
       )

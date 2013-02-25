@@ -35,6 +35,10 @@ module Triglav
     def endpoint_for (type, *args)
       endpoint = API_ENDPOINT_MAP[type]
 
+      unless endpoint
+        raise ArgumentError.new("No endpoint found for #{type}")
+      end
+
       if args.empty?
         endpoint
       else
@@ -49,22 +53,25 @@ module Triglav
 
     def services
       endpoint = endpoint_for(:services)
-      response = dispatch_request(endpoint[])
+      response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map { |e| e['service'] }
     end
 
     def roles
-      response = dispatch_request(endpoint_for(:roles))
+      endpoint = endpoint_for(:roles)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map { |e| e['role'] }
     end
 
     def roles_in (service)
-      response = dispatch_request(endpoint_for(:roles_in, service))
+      endpoint = endpoint_for(:roles_in, service)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map { |e| e['role'] }
     end
 
     def hosts (options = {})
-      response = dispatch_request(endpoint_for(:hosts))
+      endpoint = endpoint_for(:hosts)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map { |e| e['host'] }.select do |h|
         if options[:with_inactive]
           true
@@ -82,9 +89,11 @@ module Triglav
       end
 
       if (role)
-        response = dispatch_request(:hosts_in, service, role)
+        endpoint = endpoint_for(:hosts_in, service, role)
+        response = dispatch_request(endpoint[:method], endpoint[:path])
       else
-        response = dispatch_request(hosts_in, service)
+        endpoint = endpoint_for(:hosts_in, service)
+        response = dispatch_request(endpoint[:method], endpoint[:path])
       end
 
       response.map { |e| e['host'] }.select do |h|

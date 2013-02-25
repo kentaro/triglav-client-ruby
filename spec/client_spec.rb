@@ -34,9 +34,10 @@ describe Triglav::Client do
       include_context 'initialize client'
 
       it {
-        expect(subject.endpoint_for(:services)).to be == [
-          :get, '/api/services.json'
-        ]
+        expect(subject.endpoint_for(:services)).to be == {
+          method: :get,
+          path:   '/api/services.json',
+        }
       }
     end
 
@@ -44,9 +45,10 @@ describe Triglav::Client do
       include_context 'initialize client'
 
       it {
-        expect(subject.endpoint_for(:roles_in, 'triglav')).to be == [
-          :get, '/api/services/triglav/roles.json'
-        ]
+        expect(subject.endpoint_for(:roles_in, 'triglav')).to be == {
+          method: :get,
+          path:   '/api/services/triglav/roles.json',
+        }
       }
     end
 
@@ -54,20 +56,30 @@ describe Triglav::Client do
       include_context 'initialize client'
 
       it {
-        expect(subject.endpoint_for(:hosts_in, 'triglav', 'app')).to be == [
-          :get, '/api/services/triglav/roles/app/hosts.json'
-        ]
+        expect(subject.endpoint_for(:hosts_in, 'triglav', 'app')).to be == {
+          method: :get,
+          path:   '/api/services/triglav/roles/app/hosts.json',
+        }
+      }
+    end
+
+    context 'when no endpoint is found' do
+      include_context 'initialize client'
+
+      it {
+        expect {
+          subject.endpoint_for(:no_such_type).to raise_error(ArgumentError)
+        }
       }
     end
   end
 
   describe '#services' do
     include_context 'initialize client with fixtures'
-    let(:endpoint) { subject.endpoint_for(:serices) }
 
-    before {
-      subject.stub(:dispatch_request).and_return(services)
-    }
+    let(:endpoint) { subject.endpoint_for(:services) }
+    let(:res_code) { 204 }
+    let(:res_body) { services.to_json }
 
     it {
       response = subject.services
@@ -80,9 +92,9 @@ describe Triglav::Client do
   describe '#roles' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(roles)
-    }
+    let(:endpoint) { subject.endpoint_for(:roles) }
+    let(:res_code) { 204 }
+    let(:res_body) { roles.to_json }
 
     it {
       response = subject.roles
@@ -95,9 +107,9 @@ describe Triglav::Client do
   describe '#roles_in' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(roles)
-    }
+    let(:endpoint) { subject.endpoint_for(:roles_in, 'triglav') }
+    let(:res_code) { 204 }
+    let(:res_body) { roles.to_json }
 
     it {
       response = subject.roles_in('triglav')
@@ -105,22 +117,14 @@ describe Triglav::Client do
       expect(response).to be_an_instance_of Array
       expect(response.size).to be == roles.size
     }
-
-    context 'when `service` is not passed' do
-      include_context 'initialize client with fixtures'
-
-      it {
-        expect { subject.roles_in }.to raise_error(ArgumentError)
-      }
-    end
   end
 
   describe '#hosts' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(hosts)
-    }
+    let(:endpoint) { subject.endpoint_for(:hosts) }
+    let(:res_code) { 204 }
+    let(:res_body) { hosts.to_json }
 
     context 'and `with_inactive` option is not passed' do
       it {
@@ -144,11 +148,11 @@ describe Triglav::Client do
   describe '#hosts_in' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(hosts)
-    }
-
     context 'when `role` is passed' do
+      let(:endpoint) { subject.endpoint_for(:hosts_in, 'triglav', 'app') }
+      let(:res_code) { 204 }
+      let(:res_body) { hosts.to_json }
+
       context 'and `with_inactive` option is not passed' do
         it {
           response = subject.hosts_in('triglav', 'app')
@@ -169,6 +173,10 @@ describe Triglav::Client do
     end
 
     context 'when `role` is not passed' do
+      let(:endpoint) { subject.endpoint_for(:hosts_in, 'triglav') }
+      let(:res_code) { 204 }
+      let(:res_body) { hosts.to_json }
+
       context 'and `with_inactive` option is not passed' do
         it {
           response = subject.hosts_in('triglav')
