@@ -78,7 +78,7 @@ describe Triglav::Client do
     include_context 'initialize client with model fixtures'
 
     let(:fixture)  { fixture_for('service') }
-    let(:endpoint) { { method: :post, path: "/api/services" } }
+    let(:endpoint) { Triglav::Model::Service.endpoint_for(:create) }
     let(:res_code) { 204 }
     let(:res_body) { fixture.to_json }
 

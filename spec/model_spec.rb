@@ -12,9 +12,9 @@ require 'spec_helper'
     include_context 'initialize client with model fixtures'
 
     describe '.create' do
-      context 'when a model successfully created' do
+      context 'when a model is successfully created' do
         let(:fixture)  { fixture_for(model_name) }
-        let(:endpoint) { { method: :post, path: "/api/#{klass.path}" } }
+        let(:endpoint) { klass.endpoint_for(:create) }
         let(:res_code) { 204 }
         let(:res_body) { fixture.to_json }
 
@@ -26,47 +26,59 @@ require 'spec_helper'
     end
 
     describe '#show' do
-      before {
-        subject.client.stub(:dispatch_request).and_return(fixture_for(model_name))
-      }
+      context 'when a model is successfully shown' do
+        let(:fixture)  { fixture_for(model_name) }
+        let(:endpoint) { model.class.endpoint_for(:show, model.info.name) }
+        let(:res_code) { 200 }
+        let(:res_body) { fixture.to_json }
 
-      it {
-        response = subject.show
-        expect(response).to be == fixture_for(model_name)
-      }
+        it {
+          result = model.show
+          expect(result).to be_an_instance_of(klass)
+        }
+      end
     end
 
     describe '#update' do
-      before {
-        subject.client.stub(:dispatch_request).and_return(fixture_for(model_name))
-      }
+      context 'when a model is successfully updated' do
+        let(:fixture)  { fixture_for(model_name) }
+        let(:endpoint) { model.class.endpoint_for(:update, model.info.name) }
+        let(:res_code) { 200 }
+        let(:res_body) { fixture.to_json }
 
-      it {
-        response = subject.update
-        expect(response).to be == fixture_for(model_name)
-      }
+        it {
+          result = model.update(name: fixture[model_name]['name'])
+          expect(result).to be_an_instance_of(klass)
+        }
+      end
     end
 
     describe '#destroy' do
-      before {
-        subject.client.stub(:dispatch_request).and_return(fixture_for(model_name))
-      }
+      context 'when a model is successfully updated' do
+        let(:fixture)  { fixture_for(model_name) }
+        let(:endpoint) { model.class.endpoint_for(:destroy, model.info.name) }
+        let(:res_code) { 200 }
+        let(:res_body) { fixture.to_json }
 
-      it {
-        response = subject.destroy
-        expect(response).to be == fixture_for(model_name)
-      }
+        it {
+          result = model.destroy
+          expect(result).to be_an_instance_of(klass)
+        }
+      end
     end
 
     describe '#revert' do
-      before {
-        subject.client.stub(:dispatch_request).and_return(fixture_for(model_name))
-      }
+      context 'when a model is successfully updated' do
+        let(:fixture)  { fixture_for(model_name) }
+        let(:endpoint) { model.class.endpoint_for(:revert, model.info.name) }
+        let(:res_code) { 200 }
+        let(:res_body) { fixture.to_json }
 
-      it {
-        response = subject.revert
-        expect(response).to be == fixture_for(model_name)
-      }
+        it {
+          result = model.revert
+          expect(result).to be_an_instance_of(klass)
+        }
+      end
     end
   end
 end

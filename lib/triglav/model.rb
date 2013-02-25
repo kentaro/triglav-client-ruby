@@ -1,3 +1,4 @@
+require 'uri'
 require 'ostruct'
 
 module Triglav
@@ -10,25 +11,49 @@ module Triglav
         @info   = OpenStruct.new(args[:info])
       end
 
+      API_ENDPOINT_MAP = {
+        create:  { method: :post,   path: '/api/%s.json'           },
+        show:    { method: :get,    path: '/api/%s/%s.json'        },
+        update:  { method: :post,   path: '/api/%s/%s.json'        },
+        destroy: { method: :delete, path: '/api/%s/%s.json'        },
+        revert:  { method: :get,    path: '/api/%s/%s/revert.json' },
+      }
+
+      def self.endpoint_for (type, *args)
+        endpoint = API_ENDPOINT_MAP[type]
+        path = endpoint[:path] % [self.path, *args.map { |e| URI.encode(e) }]
+
+        { method: endpoint[:method], path: path }
+      end
+
       def self.create(client, params = {})
-        result = client.dispatch_request(:post, "/api/#{path}", params)
-        self.new(client: client, info: result)
+        endpoint = endpoint_for(:create)
+        result   = client.dispatch_request(endpoint[:method], endpoint[:path], params)
+        new(client: client, info: result)
       end
 
       def show
-        client.dispatch_request(:get, "/api/#{self.class.path}/#{info.name}.json")
+        endpoint = self.class.endpoint_for(:show, info.name)
+        result   = client.dispatch_request(endpoint[:method], endpoint[:path])
+        self.class.new(client: client, info: result)
       end
 
       def update(params = {})
-        client.dispatch_request(:put, "/api/#{self.class.path}/#{info.name}.json", params)
+        endpoint = self.class.endpoint_for(:update, info.name)
+        result   = client.dispatch_request(endpoint[:method], endpoint[:path], params)
+        self.class.new(client: client, info: result)
       end
 
       def destroy
-        client.dispatch_request(:delete, "/api/#{self.class.path}/#{info.name}.json")
+        endpoint = self.class.endpoint_for(:destroy, info.name)
+        result   = client.dispatch_request(endpoint[:method], endpoint[:path])
+        self.class.new(client: client, info: result)
       end
 
       def revert
-        client.dispatch_request(:put, "/api/#{self.class.path}/#{info.name}/revert.json")
+        endpoint = self.class.endpoint_for(:revert, info.name)
+        result   = client.dispatch_request(endpoint[:method], endpoint[:path])
+        self.class.new(client: client, info: result)
       end
     end
 
