@@ -84,7 +84,7 @@ module Triglav
         if options[:with_inactive]
           true
         else
-          h.info['active']
+          h.info.active
         end
       end
     end
@@ -110,7 +110,7 @@ module Triglav
         if options[:with_inactive]
           true
         else
-          h.info['active']
+          h.info.active
         end
       end
     end
