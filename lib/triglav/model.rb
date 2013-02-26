@@ -14,7 +14,7 @@ module Triglav
       API_ENDPOINT_MAP = {
         create:  { method: :post,   path: '/api/%s'           },
         show:    { method: :get,    path: '/api/%s/%s'        },
-        update:  { method: :post,   path: '/api/%s/%s'        },
+        update:  { method: :put,    path: '/api/%s/%s'        },
         destroy: { method: :delete, path: '/api/%s/%s'        },
         revert:  { method: :get,    path: '/api/%s/%s/revert' },
       }

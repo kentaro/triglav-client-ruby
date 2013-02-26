@@ -143,6 +143,7 @@ module Triglav
       req = case method
             when :get;    Net::HTTP::Get.new(path)
             when :post;   req = Net::HTTP::Post.new(path); req.set_form_data(params); req
+            when :put;    req = Net::HTTP::Put.new(path); req.set_form_data(params); req
             when :delete; Net::HTTP::Delete.new(path)
             end
 
