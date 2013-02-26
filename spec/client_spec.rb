@@ -36,7 +36,7 @@ describe Triglav::Client do
       it {
         expect(subject.endpoint_for(:services)).to be == {
           method: :get,
-          path:   '/api/services.json',
+          path:   '/api/services',
         }
       }
     end
@@ -47,7 +47,7 @@ describe Triglav::Client do
       it {
         expect(subject.endpoint_for(:roles_in, 'triglav')).to be == {
           method: :get,
-          path:   '/api/services/triglav/roles.json',
+          path:   '/api/services/triglav/roles',
         }
       }
     end
@@ -58,7 +58,7 @@ describe Triglav::Client do
       it {
         expect(subject.endpoint_for(:hosts_in, 'triglav', 'app')).to be == {
           method: :get,
-          path:   '/api/services/triglav/roles/app/hosts.json',
+          path:   '/api/services/triglav/roles/app/hosts',
         }
       }
     end
