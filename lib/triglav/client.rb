@@ -18,28 +18,82 @@ module Triglav
       end
     end
 
+    API_ENDPOINT_MAP = {
+      services: { method: :get, path: '/api/services.json'            },
+      roles:    { method: :get, path: '/api/roles.json'               },
+      roles_in: { method: :get, path: ['/api/services/%s/roles.json'] },
+      hosts:    { method: :get, path: '/api/hosts.json'               },
+      hosts_in: {
+        method: :get,
+        path: [
+          '/api/services/%s/hosts.json',
+          '/api/services/%s/roles/%s/hosts.json',
+        ]
+      },
+    }
+
+    def endpoint_for (type, *args)
+      endpoint = API_ENDPOINT_MAP[type]
+
+      unless endpoint
+        raise ArgumentError.new("No endpoint found for #{type}")
+      end
+
+      if args.empty?
+        endpoint
+      else
+        path = endpoint[:path][args.size - 1]
+
+        {
+          method: endpoint[:method],
+          path:   path % args,
+        }
+      end
+    end
+
+    def create (model, params)
+      case model
+        when :service; Model::Service.create(self, params)
+        when :role;    Model::Role.create(self, params)
+        when :host;    Model::Host.create(self, params)
+        else raise ArgumentError.new("No such model for #{model}")
+      end
+    end
+
     def services
-      response = dispatch_request('get', '/api/services.json')
-      response.map { |e| e['service'] }
+      endpoint = endpoint_for(:services)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
+      response.map do |e|
+        Model::Service.new(client: self, info: e['service'])
+      end
     end
 
     def roles
-      response = dispatch_request('get', '/api/roles.json')
-      response.map { |e| e['role'] }
+      endpoint = endpoint_for(:roles)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
+      response.map do |e|
+        Model::Role.new(client: self, info: e['role'])
+      end
     end
 
     def roles_in (service)
-      response = dispatch_request('get', "/api/services/#{service}/roles.json")
-      response.map { |e| e['role'] }
+      endpoint = endpoint_for(:roles_in, service)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
+      response.map do |e|
+        Model::Role.new(client: self, info: e['role'])
+      end
     end
 
     def hosts (options = {})
-      response = dispatch_request('get', '/api/hosts.json')
-      response.map { |e| e['host'] }.select do |h|
+      endpoint = endpoint_for(:hosts)
+      response = dispatch_request(endpoint[:method], endpoint[:path])
+      response.map do |e|
+        Model::Host.new(client: self, info: e['host'])
+      end.select do |h|
         if options[:with_inactive]
           true
         else
-          h['active']
+          h.info.active
         end
       end
     end
@@ -52,16 +106,20 @@ module Triglav
       end
 
       if (role)
-        response = dispatch_request('get', "/api/services/#{service}/roles/#{role}/hosts.json")
+        endpoint = endpoint_for(:hosts_in, service, role)
+        response = dispatch_request(endpoint[:method], endpoint[:path])
       else
-        response = dispatch_request('get', "/api/services/#{service}/hosts.json")
+        endpoint = endpoint_for(:hosts_in, service)
+        response = dispatch_request(endpoint[:method], endpoint[:path])
       end
 
-      response.map { |e| e['host'] }.select do |h|
+      response.map do |e|
+        Model::Host.new(client: self, info: e['host'])
+      end.select do |h|
         if options[:with_inactive]
           true
         else
-          h['active']
+          h.info.active
         end
       end
     end
@@ -80,9 +138,16 @@ module Triglav
     def do_request(method, path, params = {})
       uri = URI.parse(base_url)
       uri.path  = path
+      path = "#{uri.path}?api_token=#{api_token}"
+
+      req = case method
+            when :get;    Net::HTTP::Get.new(path)
+            when :post;   req = Net::HTTP::Post.new(path); req.set_form_data(params); req
+            when :delete; Net::HTTP::Delete.new(path)
+            end
 
       response = Net::HTTP.start(uri.host, uri.port) do |http|
-        http.__send__(method, "#{uri.path}?api_token=#{api_token}")
+        http.request(req)
       end
 
       if response.code.to_i >= 300

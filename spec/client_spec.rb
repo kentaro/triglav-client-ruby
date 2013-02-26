@@ -29,12 +29,81 @@ describe Triglav::Client do
     end
   end
 
+  describe 'endpoint_for' do
+    context 'when no arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:services)).to be == {
+          method: :get,
+          path:   '/api/services.json',
+        }
+      }
+    end
+
+    context 'when an arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:roles_in, 'triglav')).to be == {
+          method: :get,
+          path:   '/api/services/triglav/roles.json',
+        }
+      }
+    end
+
+    context 'when two arguments except `:type` are passed' do
+      include_context 'initialize client'
+
+      it {
+        expect(subject.endpoint_for(:hosts_in, 'triglav', 'app')).to be == {
+          method: :get,
+          path:   '/api/services/triglav/roles/app/hosts.json',
+        }
+      }
+    end
+
+    context 'when no endpoint is found' do
+      include_context 'initialize client'
+
+      it {
+        expect {
+          subject.endpoint_for(:no_such_type).to raise_error(ArgumentError)
+        }
+      }
+    end
+  end
+
+  describe '#create' do
+    include_context 'initialize client with model fixtures'
+
+    let(:fixture)  { fixture_for('service') }
+    let(:endpoint) { Triglav::Model::Service.endpoint_for(:create) }
+    let(:res_code) { 204 }
+    let(:res_body) { fixture.to_json }
+
+    context 'when model is successfully created' do
+      it {
+        result = client.create(:service, name: fixture['service']['name'])
+        expect(result).to be_an_instance_of(Triglav::Model::Service)
+      }
+    end
+
+    context 'when an invalid model name is passed' do
+      it {
+        expect {
+          client.create(:no_such_model)
+        }.to raise_error(ArgumentError)
+      }
+    end
+  end
+
   describe '#services' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(services)
-    }
+    let(:endpoint) { subject.endpoint_for(:services) }
+    let(:res_code) { 204 }
+    let(:res_body) { services.to_json }
 
     it {
       response = subject.services
@@ -47,9 +116,9 @@ describe Triglav::Client do
   describe '#roles' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(roles)
-    }
+    let(:endpoint) { subject.endpoint_for(:roles) }
+    let(:res_code) { 204 }
+    let(:res_body) { roles.to_json }
 
     it {
       response = subject.roles
@@ -62,9 +131,9 @@ describe Triglav::Client do
   describe '#roles_in' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(roles)
-    }
+    let(:endpoint) { subject.endpoint_for(:roles_in, 'triglav') }
+    let(:res_code) { 204 }
+    let(:res_body) { roles.to_json }
 
     it {
       response = subject.roles_in('triglav')
@@ -72,22 +141,14 @@ describe Triglav::Client do
       expect(response).to be_an_instance_of Array
       expect(response.size).to be == roles.size
     }
-
-    context 'when `service` is not passed' do
-      include_context 'initialize client with fixtures'
-
-      it {
-        expect { subject.roles_in }.to raise_error(ArgumentError)
-      }
-    end
   end
 
   describe '#hosts' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(hosts)
-    }
+    let(:endpoint) { subject.endpoint_for(:hosts) }
+    let(:res_code) { 204 }
+    let(:res_body) { hosts.to_json }
 
     context 'and `with_inactive` option is not passed' do
       it {
@@ -111,11 +172,11 @@ describe Triglav::Client do
   describe '#hosts_in' do
     include_context 'initialize client with fixtures'
 
-    before {
-      subject.stub(:dispatch_request).and_return(hosts)
-    }
-
     context 'when `role` is passed' do
+      let(:endpoint) { subject.endpoint_for(:hosts_in, 'triglav', 'app') }
+      let(:res_code) { 204 }
+      let(:res_body) { hosts.to_json }
+
       context 'and `with_inactive` option is not passed' do
         it {
           response = subject.hosts_in('triglav', 'app')
@@ -136,6 +197,10 @@ describe Triglav::Client do
     end
 
     context 'when `role` is not passed' do
+      let(:endpoint) { subject.endpoint_for(:hosts_in, 'triglav') }
+      let(:res_code) { 204 }
+      let(:res_body) { hosts.to_json }
+
       context 'and `with_inactive` option is not passed' do
         it {
           response = subject.hosts_in('triglav')
