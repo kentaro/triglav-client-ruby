@@ -19,15 +19,15 @@ module Triglav
     end
 
     API_ENDPOINT_MAP = {
-      services: { method: :get, path: '/api/services.json'            },
-      roles:    { method: :get, path: '/api/roles.json'               },
-      roles_in: { method: :get, path: ['/api/services/%s/roles.json'] },
-      hosts:    { method: :get, path: '/api/hosts.json'               },
+      services: { method: :get, path: '/api/services'            },
+      roles:    { method: :get, path: '/api/roles'               },
+      roles_in: { method: :get, path: ['/api/services/%s/roles'] },
+      hosts:    { method: :get, path: '/api/hosts'               },
       hosts_in: {
         method: :get,
         path: [
-          '/api/services/%s/hosts.json',
-          '/api/services/%s/roles/%s/hosts.json',
+          '/api/services/%s/hosts',
+          '/api/services/%s/roles/%s/hosts',
         ]
       },
     }

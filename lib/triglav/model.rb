@@ -12,11 +12,11 @@ module Triglav
       end
 
       API_ENDPOINT_MAP = {
-        create:  { method: :post,   path: '/api/%s.json'           },
-        show:    { method: :get,    path: '/api/%s/%s.json'        },
-        update:  { method: :post,   path: '/api/%s/%s.json'        },
-        destroy: { method: :delete, path: '/api/%s/%s.json'        },
-        revert:  { method: :get,    path: '/api/%s/%s/revert.json' },
+        create:  { method: :post,   path: '/api/%s'           },
+        show:    { method: :get,    path: '/api/%s/%s'        },
+        update:  { method: :post,   path: '/api/%s/%s'        },
+        destroy: { method: :delete, path: '/api/%s/%s'        },
+        revert:  { method: :get,    path: '/api/%s/%s/revert' },
       }
 
       def self.endpoint_for (type, *args)
