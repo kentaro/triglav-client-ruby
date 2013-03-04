@@ -1,6 +1,7 @@
 require 'json'
 require 'net/http'
 
+require 'triglav/model'
 require 'triglav/client/version'
 
 module Triglav
