@@ -15,9 +15,17 @@ client = Triglav::Client.new(
 # Services
 client.services                      #=> Returns all the services registered on Triglav
 
+# Get service information
+service = client.services.first      #=> Triglav::Model::Service instance
+service.info.name                    #=> "sqale"
+
 # Roles
 client.roles                         #=> Returns all the roles registered on Triglav
 client.roles_in('sqale')             #=> Only roles in the service
+
+# Get role information
+role = client.roles_in('sqale').first   #=> Triglav::Model::Role instance
+role.info.name                          #=> "app"
 
 # Active hosts (default behaviour)
 client.hosts                         #=> Returns all the hosts registered on Triglav
@@ -28,6 +36,10 @@ client.hosts_in('sqale', 'users')    #=> Only hosts in the service and which hav
 client.hosts(with_inactive: true)
 client.hosts_in('sqale',     nil, with_inactive: true)
 client.hosts_in('sqale', 'users', with_inactive: true)
+
+# Get host information
+host = client.hosts_in('sqale').first   #=> Triglav::Model::Host instance
+host.info.name                          #=> "app001.sqale.jp"
 ```
 
 ## Installation
