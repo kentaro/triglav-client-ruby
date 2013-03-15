@@ -39,15 +39,15 @@ shared_context 'initialize client with fixtures' do
 
   let(:services) {
     [
-      { 'service' => { 'id' => 1 } },
-      { 'service' => { 'id' => 2 } },
+      { 'id' => 1 },
+      { 'id' => 2 },
     ]
   }
 
   let(:roles) {
     [
-      { 'role' => { 'id' => 1 } },
-      { 'role' => { 'id' => 2 } },
+      { 'id' => 1 },
+      { 'id' => 2 },
     ]
   }
 
@@ -65,7 +65,7 @@ shared_context 'initialize client with model fixtures' do
   include_context 'setup request'
 
   let(:model) {
-    info = fixture_for(model_name)[model_name]
+    info = fixture_for(model_name)
 
     klass_name.new(
       client: client,
@@ -96,14 +96,14 @@ shared_context 'initialize client with model fixtures' do
   end
 
   let(:service) {
-    { 'service' => { 'id' => 1, 'name' => 'test service' } }
+    { 'id' => 1, 'name' => 'test service' }
   }
 
   let(:role) {
-    { 'role' => { 'id' => 1, 'name' => 'test role' } }
+    { 'id' => 1, 'name' => 'test role' }
   }
 
   let(:host) {
-    { 'host' => { 'id' => 1, 'name' => 'test host', 'active' => true }  }
+    { 'id' => 1, 'name' => 'test host', 'active' => true }
   }
 end

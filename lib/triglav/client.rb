@@ -64,32 +64,32 @@ module Triglav
     def services
       endpoint = endpoint_for(:services)
       response = dispatch_request(endpoint[:method], endpoint[:path])
-      response.map do |e|
-        Model::Service.new(client: self, info: e['service'])
+      response.map do |info|
+        Model::Service.new(client: self, info: info)
       end
     end
 
     def roles
       endpoint = endpoint_for(:roles)
       response = dispatch_request(endpoint[:method], endpoint[:path])
-      response.map do |e|
-        Model::Role.new(client: self, info: e['role'])
+      response.map do |info|
+        Model::Role.new(client: self, info: info)
       end
     end
 
     def roles_in (service)
       endpoint = endpoint_for(:roles_in, service)
       response = dispatch_request(endpoint[:method], endpoint[:path])
-      response.map do |e|
-        Model::Role.new(client: self, info: e['role'])
+      response.map do |info|
+        Model::Role.new(client: self, info: info)
       end
     end
 
     def hosts (options = {})
       endpoint = endpoint_for(:hosts)
       response = dispatch_request(endpoint[:method], endpoint[:path])
-      response.map do |e|
-        Model::Host.new(client: self, info: e)
+      response.map do |info|
+        Model::Host.new(client: self, info: info)
       end.select do |h|
         if options[:with_inactive]
           true
@@ -114,8 +114,8 @@ module Triglav
         response = dispatch_request(endpoint[:method], endpoint[:path])
       end
 
-      response.map do |e|
-        Model::Host.new(client: self, info: e)
+      response.map do |info|
+        Model::Host.new(client: self, info: info)
       end.select do |h|
         if options[:with_inactive]
           true

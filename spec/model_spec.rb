@@ -19,7 +19,7 @@ require 'spec_helper'
         let(:res_body) { fixture.to_json }
 
         it {
-          result = klass_name.create(client, name: fixture[model_name]['name'])
+          result = klass_name.create(client, name: fixture['name'])
           expect(result).to be_an_instance_of(klass)
         }
       end
@@ -47,7 +47,7 @@ require 'spec_helper'
         let(:res_body) { fixture.to_json }
 
         it {
-          result = model.update(name: fixture[model_name]['name'])
+          result = model.update(name: fixture['name'])
           expect(result).to be_an_instance_of(klass)
         }
       end

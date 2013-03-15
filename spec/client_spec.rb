@@ -84,7 +84,7 @@ describe Triglav::Client do
 
     context 'when model is successfully created' do
       it {
-        result = client.create(:service, name: fixture['service']['name'])
+        result = client.create(:service, name: fixture['name'])
         expect(result).to be_an_instance_of(Triglav::Model::Service)
       }
     end
