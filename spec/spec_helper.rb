@@ -53,9 +53,9 @@ shared_context 'initialize client with fixtures' do
 
   let(:hosts) {
     [
-      { 'host' => { 'id' => 1, 'active' => true }  },
-      { 'host' => { 'id' => 2, 'active' => false } },
-      { 'host' => { 'id' => 2, 'active' => true }  },
+      { 'id' => 1, 'active' => true  },
+      { 'id' => 2, 'active' => false },
+      { 'id' => 2, 'active' => true  },
     ]
   }
 end

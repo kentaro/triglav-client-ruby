@@ -226,7 +226,8 @@ describe Triglav::Client do
     context 'when arguments are passed correctly' do
       context 'and request is successfully dispatched' do
         before {
-          subject.stub(:do_request).and_return('{ "result": "ok" }')
+          subject.stub(:do_request).and_return(true)
+          subject.stub(:handle_response).and_return("result" => "ok")
         }
 
         it {

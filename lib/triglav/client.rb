@@ -89,7 +89,7 @@ module Triglav
       endpoint = endpoint_for(:hosts)
       response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map do |e|
-        Model::Host.new(client: self, info: e['host'])
+        Model::Host.new(client: self, info: e)
       end.select do |h|
         if options[:with_inactive]
           true
@@ -115,7 +115,7 @@ module Triglav
       end
 
       response.map do |e|
-        Model::Host.new(client: self, info: e['host'])
+        Model::Host.new(client: self, info: e)
       end.select do |h|
         if options[:with_inactive]
           true
@@ -130,8 +130,8 @@ module Triglav
         raise ArgumentError.new("Both `method` and `path` are required.")
       end
 
-      json = do_request(method, path, params)
-      JSON.parse(json)
+      response = do_request(method, path, params)
+      handle_response(response)
     end
 
     private
@@ -153,10 +153,14 @@ module Triglav
       end
 
       if response.code.to_i >= 300
-        raise Error.new("#{response.code}: #{response.message}")
+        raise Error.new(handle_response(response))
       end
 
-      response.body
+      response
+    end
+
+    def handle_response(response)
+      JSON.parse(response.body)
     end
   end
 end
