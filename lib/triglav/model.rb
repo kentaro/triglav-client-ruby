@@ -4,7 +4,7 @@ require 'ostruct'
 module Triglav
   module Model
     class Base
-      attr_reader :client, :info
+      attr_accessor :client, :info
 
       def initialize(args)
         @client = args[:client]
@@ -16,7 +16,7 @@ module Triglav
         show:    { method: :get,    path: '/api/%s/%s'        },
         update:  { method: :put,    path: '/api/%s/%s'        },
         destroy: { method: :delete, path: '/api/%s/%s'        },
-        revert:  { method: :get,    path: '/api/%s/%s/revert' },
+        revert:  { method: :put,    path: '/api/%s/%s/revert' },
       }
 
       def self.endpoint_for (type, *args)
@@ -49,9 +49,11 @@ module Triglav
       end
 
       def show
-        endpoint = self.class.endpoint_for(:show, info.name)
-        result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+        endpoint  = self.class.endpoint_for(:show, info.name)
+        result    = client.dispatch_request(endpoint[:method], endpoint[:path])
+
+        self.info = OpenStruct.new(result)
+        self
       end
 
       def update(params = {})
@@ -61,19 +63,25 @@ module Triglav
           endpoint[:path],
           self.class.build_params(params),
         )
-        self.class.new(client: client, info: result)
+
+        self.info = OpenStruct.new(result)
+        self
       end
 
       def destroy
         endpoint = self.class.endpoint_for(:destroy, info.name)
         result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+
+        self.info = OpenStruct.new(result)
+        self
       end
 
       def revert
-        endpoint = self.class.endpoint_for(:revert, info.name)
-        result   = client.dispatch_request(endpoint[:method], endpoint[:path])
-        self.class.new(client: client, info: result)
+        endpoint  = self.class.endpoint_for(:revert, info.name)
+        result    = client.dispatch_request(endpoint[:method], endpoint[:path])
+
+        self.info = OpenStruct.new(result)
+        self
       end
     end
 

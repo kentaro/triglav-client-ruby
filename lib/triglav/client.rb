@@ -54,9 +54,9 @@ module Triglav
 
     def create (model, params)
       case model
-        when :service; Model::Service.create(self, params)
-        when :role;    Model::Role.create(self, params)
-        when :host;    Model::Host.create(self, params)
+        when :service; Triglav::Model::Service.create(self, params)
+        when :role;    Triglav::Model::Role.create(self, params)
+        when :host;    Triglav::Model::Host.create(self, params)
         else raise ArgumentError.new("No such model for #{model}")
       end
     end
@@ -65,7 +65,7 @@ module Triglav
       endpoint = endpoint_for(:services)
       response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map do |info|
-        Model::Service.new(client: self, info: info)
+        Triglav::Model::Service.new(client: self, info: info)
       end
     end
 
@@ -73,7 +73,7 @@ module Triglav
       endpoint = endpoint_for(:roles)
       response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map do |info|
-        Model::Role.new(client: self, info: info)
+        Triglav::Model::Role.new(client: self, info: info)
       end
     end
 
@@ -81,7 +81,7 @@ module Triglav
       endpoint = endpoint_for(:roles_in, service)
       response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map do |info|
-        Model::Role.new(client: self, info: info)
+        Triglav::Model::Role.new(client: self, info: info)
       end
     end
 
@@ -89,7 +89,7 @@ module Triglav
       endpoint = endpoint_for(:hosts)
       response = dispatch_request(endpoint[:method], endpoint[:path])
       response.map do |info|
-        Model::Host.new(client: self, info: info)
+        Triglav::Model::Host.new(client: self, info: info)
       end.select do |h|
         if options[:with_inactive]
           true
@@ -115,7 +115,7 @@ module Triglav
       end
 
       response.map do |info|
-        Model::Host.new(client: self, info: info)
+        Triglav::Model::Host.new(client: self, info: info)
       end.select do |h|
         if options[:with_inactive]
           true
