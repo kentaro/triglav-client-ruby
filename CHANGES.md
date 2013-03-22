@@ -1,5 +1,9 @@
 # Changes for triglav-client-ruby
 
+## 0.0.7
+
+  * Bugfix: Fix client and model along with API changes
+
 ## 0.0.6
 
   * Bugfix: Fix client and model along with API changes
